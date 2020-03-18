@@ -101,9 +101,13 @@ def gameLoop():
 
             if event.type == pygame.QUIT:
                 gameOver = True
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    for x in board:
+                        print(x)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # if the piece is selected and the selection to move is the correct direction of the piece (-7 going up)
+                # king functionality somehow
 
                 possible_x_pos = []
                 possible_y_pos = []
@@ -136,17 +140,10 @@ def gameLoop():
                     print(board[selected_y_pos][selected_x_pos])
                 else:
                     print('empty' + "\n")
-                    move_color = ''
+                    # move_color = ''
                     # MOVE MADE HERE
                     if len(selection) != 0:
                         # MOVE CODE
-                        move_color = board[selection[1]][selection[0]]
-                        board[selection[1]][selection[0]] = " "
-                        board[selected_y_pos][selected_x_pos] = move_color
-
-                        switch_color()
-                        # FLIPS THE BOARD AFTER EACH MOVE OR BY CLICKING EMPTY SQUARE
-                        # flip_board()
 
                         final_x = selected_x_pos
                         final_y = selected_y_pos
@@ -154,13 +151,34 @@ def gameLoop():
                         original_x = selection[0]
                         original_y = selection[1]
 
-                        print("(" + str(original_x + 1) + ", " + str(original_y + 1) + ") -> (" + str(final_x + 1) +
-                              ", " + str(final_y + 1) + ")")
-                        # if you moved two diagonal
-                        # print(str(final_x) + " + " + str(final_y) + " - " + str(original_x) + " + " + str(original_y))
-                        # print((final_x + final_y * 8) - (original_x + original_y * 8))
+                        # difference in position between original and final
+                        diff_in_pos = (final_x + final_y * 8) - (original_x + original_y * 8)
 
-                        if abs((final_x + final_y * 8) - (original_x + original_y * 8)) == 14:
+                        # white can only -9 -7
+                        # black can only 9 7
+                        move_color = board[original_y][original_x]
+                        print(diff_in_pos)
+                        # if color is white and it is moving up
+                        if (move_color == "w" and (diff_in_pos == -9 or diff_in_pos == -7)) or\
+                                (move_color == "b" and (diff_in_pos == 9 or diff_in_pos == 7)):
+
+                            board[original_y][original_x] = " "
+                            board[final_y][final_x] = move_color
+                            print(move_color)
+                            switch_color()
+
+                            # FLIPS THE BOARD AFTER EACH MOVE OR BY CLICKING EMPTY SQUARE
+                            # flip_board()
+
+                            print("(" + str(original_x + 1) + ", " + str(original_y + 1) + ") -> (" + str(final_x + 1) +
+                                  ", " + str(final_y + 1) + ")")
+                            # if you moved two diagonal
+                            print(str(final_x) + " + " + str(final_y) + " - " + str(original_x) + " + " + str(original_y))
+                            print((final_x + final_y * 8) - (original_x + original_y * 8))
+
+                        # capture hop event handler
+                        # issue is that it deletes the position but doesnt replace the moved piece
+                        if abs(diff_in_pos) == 14:
 
                             if final_x > original_x:
                                 # up right
@@ -169,9 +187,12 @@ def gameLoop():
                                 # down left
                                 board[original_y + 1][original_x - 1] = " "
                             # switches the color to negate the previous color switch, so same color makes another move
-                            switch_color()
 
-                        elif abs((final_x + final_y * 8) - (original_x + original_y * 8)) == 18:
+                            board[original_y][original_x] = " "
+                            board[final_y][final_x] = move_color
+                            print(move_color)
+
+                        elif abs(diff_in_pos) == 18:
 
                             if final_y < original_y:
                                 # up left
@@ -181,7 +202,9 @@ def gameLoop():
                                 # down right
                                 board[original_y + 1][original_x + 1] = " "
 
-                            switch_color()
+                            board[original_y][original_x] = " "
+                            board[final_y][final_x] = move_color
+                            print(move_color)
 
         for y in range(8):
             for x in range(8):
